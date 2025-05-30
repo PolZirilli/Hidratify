@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hidratify - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-blue-100">
+  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-sm">
+    <h1 class="text-2xl font-bold mb-6 text-center">Hidratify</h1>
+    
+    <input id="email" type="email" placeholder="Email" class="w-full mb-3 p-2 border rounded-lg" />
+    <input id="password" type="password" placeholder="Contraseña" class="w-full mb-4 p-2 border rounded-lg" />
+
+    <div class="flex justify-between mb-4">
+      <button onclick="login()" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Login</button>
+      <button onclick="register()" class="bg-gray-300 px-4 py-2 rounded-lg">Registrar</button>
+    </div>
+
+    <div id="popup" class="hidden bg-green-100 text-green-800 p-3 rounded-lg text-center text-sm mt-4"></div>
+  </div>
+
+  <script src="app/firebase-config.js"></script>
+  <script src="app/auth.js"></script>
+</body>
+</html>
