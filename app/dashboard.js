@@ -56,8 +56,8 @@ function cargarTabla(user, tipo, tablaId, totalId) {
             <td>${d.hora}</td>
             <td>${d.ml}</td>
             <td>
-              <button onclick="editar('${tipo}', '${doc.id}', ${d.ml})">✏️</button>
-              <button onclick="eliminar('${tipo}', '${doc.id}')">🗑️</button>
+              <button onclick="editar('${tipo}', '${doc.id}', ${d.ml})" class="pr-2 pl-2"><i class="fa-solid fa-pencil"></i></button>
+              <button onclick="eliminar('${tipo}', '${doc.id}')" class="pr-2 pl-2" ><i class="fa-solid fa-trash"></i></button>
             </td>
           </tr>
         `;
