@@ -15,3 +15,9 @@ th:nth-child(4) {
 #tablaOrina td:nth-child(4) {
     text-align: center;
 }
+#tablaOrina tr, #tablaAgua tr {
+    border-bottom: 1px solid #e5e7eb75;
+}
+.justify-around {
+    justify-content: space-between !important;
+}
