@@ -1,10 +1,17 @@
 th {
     text-align: left;
 }
-
+th:nth-child(4) {
+    text-align: center;
+}
 #tablaAgua td:nth-child(3),
 #tablaOrina td:nth-child(3), 
 #tablaAgua td:nth-child(4),
 #tablaOrina td:nth-child(4) {
     font-weight: bold;
+}
+
+#tablaAgua td:nth-child(4),
+#tablaOrina td:nth-child(4) {
+    text-align: center;
 }
