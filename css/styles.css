@@ -1,0 +1,10 @@
+th {
+    text-align: left;
+}
+
+#tablaAgua td:nth-child(3),
+#tablaOrina td:nth-child(3), 
+#tablaAgua td:nth-child(4),
+#tablaOrina td:nth-child(4) {
+    font-weight: bold;
+}
