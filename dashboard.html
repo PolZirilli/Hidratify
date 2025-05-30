@@ -15,7 +15,7 @@
 <body class="bg-blue-100 min-h-screen p-4">
   <div class="max-w-2xl mx-auto bg-white p-6 rounded-3xl shadow-md">
     
-    <div class="flex justify-end mb-4">
+    <div class="flex justify-end mb-2">
         <button id="btnLogout" class="text-black py-1 px-3"><i class="fa-solid fa-key"></i></button>
     </div>
 
@@ -24,28 +24,30 @@
     <input id="mlInput" type="number" placeholder="Cantidad (ml)" class="w-full p-2 border rounded-lg mb-3" />
 
     <div class="flex justify-around mb-6">
-      <button onclick="guardarRegistro('agua')" class="bg-blue-400 text-white px-20 py-3 rounded-lg"><i class="fa-solid fa-glass-water"></i></button>
-      <button onclick="guardarRegistro('orina')" class="bg-yellow-300 text-white px-20 py-3 rounded-lg"><i class="fa-solid fa-toilet"></i></button>
+      <button onclick="guardarRegistro('agua')" class="bg-blue-400 text-white px-16 py-3 rounded-lg"><i class="fa-solid fa-glass-water"></i></button>
+      <button onclick="guardarRegistro('orina')" class="bg-yellow-300 text-white px-16 py-3 rounded-lg"><i class="fa-solid fa-toilet"></i></button>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <h3 class="font-bold mb-2">Historial Agua</h3>
+        <h3 class="font-bold mb-2"><i class="fa-solid fa-toilet"></i> Historial Orina</h3>
         <table class="w-full text-sm">
           <thead><tr><th>Fecha</th><th>Hora</th><th>ml</th><th>Acciones</th></tr></thead>
-          <tbody id="tablaAgua"></tbody>
-          <tfoot><tr><td colspan="2" class="text-right font-bold">Total:</td><td id="totalAgua"></td></tr></tfoot>
+          <tbody id="tablaOrina"></tbody>
+          <tfoot><tr><td colspan="3" class="text-right font-bold">Total:</td><td id="totalOrina"></td></tr></tfoot>
         </table>
       </div>
 
       <div>
-        <h3 class="font-bold mb-2">Historial Orina</h3>
+        <h3 class="font-bold mb-2"><i class="fa-solid fa-glass-water"></i> Historial Agua</h3>
         <table class="w-full text-sm">
           <thead><tr><th>Fecha</th><th>Hora</th><th>ml</th><th>Acciones</th></tr></thead>
-          <tbody id="tablaOrina"></tbody>
-          <tfoot><tr><td colspan="2" class="text-right font-bold">Total:</td><td id="totalOrina"></td></tr></tfoot>
+          <tbody id="tablaAgua"></tbody>
+          <tfoot><tr><td colspan="3" class="text-right font-bold">Total:</td><td id="totalAgua"></td></tr></tfoot>
         </table>
       </div>
+
+      
     </div>
   </div>
 
