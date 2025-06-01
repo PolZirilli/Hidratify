@@ -7,12 +7,10 @@ function formatearFecha(fecha) {
   const f = new Date(fecha);
   return f.toLocaleDateString("es-AR");
 }
-
 function formatearHora(fecha) {
   const f = new Date(fecha);
   return f.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: true });
 }
-
 function guardarRegistro(tipo) {
   const cantidad = parseInt(document.getElementById("mlInput").value);
   if (isNaN(cantidad) || cantidad <= 0) return;
@@ -37,22 +35,38 @@ function cargarDatos() {
   cargarTabla(user, "agua", "tablaAgua", "totalAgua");
   cargarTabla(user, "orina", "tablaOrina", "totalOrina");
 }
-
 function cargarTabla(user, tipo, tablaId, totalId) {
+  const tabla = document.getElementById(tablaId);
+  const total = document.getElementById(totalId);
+
+  // Skeleton loader
+  tabla.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    tabla.innerHTML += `
+      <tr>
+        <td><div class="h-4 bg-gray-300 animate-pulse rounded w-20"></div></td>
+        <td><div class="h-4 bg-gray-300 animate-pulse rounded w-16"></div></td>
+        <td><div class="h-4 bg-gray-300 animate-pulse rounded w-10"></div></td>
+        <td><div class="h-4 bg-gray-300 animate-pulse rounded w-12"></div></td>
+      </tr>
+    `;
+  }
+  total.innerText = "Cargando...";
+
+  // Obtener fecha de hoy en formato local
+  const hoy = new Date().toLocaleDateString("es-AR");
+
+  // Traer datos desde Firebase
   db.collection("users").doc(user.uid).collection(tipo).orderBy("timestamp", "desc").get()
     .then(snapshot => {
-      const tabla = document.getElementById(tablaId);
-      const total = document.getElementById(totalId);
       tabla.innerHTML = "";
       let suma = 0;
-
-      const hoy = new Date();
-      const fechaHoy = hoy.toLocaleDateString("es-AR"); // formato "dd/mm/aaaa"
+      let hayDatos = false;
 
       snapshot.forEach(doc => {
         const d = doc.data();
-
-        if (d.fecha === fechaHoy) {
+        if (d.fecha === hoy) {
+          hayDatos = true;
           suma += d.ml;
 
           tabla.innerHTML += `
@@ -69,15 +83,17 @@ function cargarTabla(user, tipo, tablaId, totalId) {
         }
       });
 
+      if (!hayDatos) {
+        tabla.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500">Sin registros hoy</td></tr>`;
+      }
+
       total.innerText = suma + " ml";
     });
 }
-
 function eliminar(tipo, id) {
   const user = auth.currentUser;
   db.collection("users").doc(user.uid).collection(tipo).doc(id).delete().then(() => cargarDatos());
 }
-
 function editar(tipo, id, actual) {
   const nuevo = prompt("Editar valor (ml):", actual);
   const nuevoInt = parseInt(nuevo);
@@ -88,7 +104,6 @@ function editar(tipo, id, actual) {
     ml: nuevoInt
   }).then(() => cargarDatos());
 }
-
 document.getElementById('btnLogout').addEventListener('click', () => {
   firebase.auth().signOut()
     .then(() => {
