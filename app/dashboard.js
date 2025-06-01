@@ -46,21 +46,27 @@ function cargarTabla(user, tipo, tablaId, totalId) {
       tabla.innerHTML = "";
       let suma = 0;
 
+      const hoy = new Date();
+      const fechaHoy = hoy.toLocaleDateString("es-AR"); // formato "dd/mm/aaaa"
+
       snapshot.forEach(doc => {
         const d = doc.data();
-        suma += d.ml;
 
-        tabla.innerHTML += `
-          <tr>
-            <td>${d.fecha}</td>
-            <td>${d.hora}</td>
-            <td>${d.ml}</td>
-            <td>
-              <button onclick="editar('${tipo}', '${doc.id}', ${d.ml})" class="pr-2 pl-2"><i class="fa-solid fa-pencil"></i></button>
-              <button onclick="eliminar('${tipo}', '${doc.id}')" class="pr-2 pl-2" ><i class="fa-solid fa-trash"></i></button>
-            </td>
-          </tr>
-        `;
+        if (d.fecha === fechaHoy) {
+          suma += d.ml;
+
+          tabla.innerHTML += `
+            <tr>
+              <td>${d.fecha}</td>
+              <td>${d.hora}</td>
+              <td>${d.ml}</td>
+              <td>
+                <button onclick="editar('${tipo}', '${doc.id}', ${d.ml})" class="pr-2 pl-2"><i class="fa-solid fa-pencil"></i></button>
+                <button onclick="eliminar('${tipo}', '${doc.id}')" class="pr-2 pl-2"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        }
       });
 
       total.innerText = suma + " ml";
@@ -92,4 +98,3 @@ document.getElementById('btnLogout').addEventListener('click', () => {
       console.error('Error al cerrar sesión:', error);
     });
 });
-
