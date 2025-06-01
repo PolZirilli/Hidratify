@@ -9,25 +9,23 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <link rel="stylesheet" href="css/styles.css">
 
 </head>
 <body class="bg-blue-100 min-h-screen p-4">
   <div class="max-w-2xl mx-auto bg-white p-6 rounded-3xl shadow-md">
-    
     <div class="flex justify-end mb-2">
         <button id="btnLogout" class="text-black py-1 px-3"><i class="fa-solid fa-key"></i></button>
     </div>
-
-    <h2 class="text-2xl font-bold text-center mb-4">Hidratify</h2>
-
+    <h2 class="text-2xl font-bold text-center mb-2"> <i class="fa-solid fa-water"></i> Hidratify</h2>
     <input id="mlInput" type="number" placeholder="Cantidad (ml)" class="w-full p-2 border rounded-lg mb-3" />
-
     <div class="flex justify-around mb-6">
       <button onclick="guardarRegistro('agua')" class="bg-blue-400 text-white px-16 py-3 rounded-lg"><i class="fa-solid fa-glass-water"></i></button>
       <button onclick="guardarRegistro('orina')" class="bg-yellow-300 text-white px-16 py-3 rounded-lg"><i class="fa-solid fa-toilet"></i></button>
     </div>
-
+    <!-- Tabla de datos -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <h3 class="font-bold mb-2"><i class="fa-solid fa-toilet"></i> Historial Orina</h3>
@@ -36,8 +34,10 @@
           <tbody id="tablaOrina"></tbody>
           <tfoot><tr><td colspan="3" class="text-right font-bold">Total:</td><td id="totalOrina" class="text-right"></td></tr></tfoot>
         </table>
+        <div class="flex justify-center mt-1 gap-4">
+          <button onclick="exportarPDF('orina')" class="bg-blue-100 text-black px-4 py-2 rounded">Exportar historial de orina <i class="fa-solid fa-file-pdf"></i></button>
+        </div>
       </div>
-
       <div>
         <h3 class="font-bold mb-2"><i class="fa-solid fa-glass-water"></i> Historial Agua</h3>
         <table class="w-full text-sm">
@@ -45,9 +45,12 @@
           <tbody id="tablaAgua"></tbody>
           <tfoot><tr><td colspan="3" class="text-right font-bold">Total:</td><td id="totalAgua" class="text-right"></td></tr></tfoot>
         </table>
-      </div>
+        <div class="flex justify-center mt-1 gap-4">
+          <button onclick="exportarPDF('agua')" class="bg-blue-100 text-black px-4 py-2 rounded">Exportar historial de agua <i class="fa-solid fa-file-pdf"></i></button>
+        </div>
+    </div>
+    <!-- / Tabla de datos -->
 
-      
     </div>
   </div>
 
@@ -55,3 +58,8 @@
   <script src="app/dashboard.js"></script>
 </body>
 </html>
+
+
+
+
+
