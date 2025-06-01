@@ -98,3 +98,30 @@ document.getElementById('btnLogout').addEventListener('click', () => {
       console.error('Error al cerrar sesión:', error);
     });
 });
+async function exportarPDF(tipo) {
+  const user = auth.currentUser;
+  const snapshot = await db.collection("users").doc(user.uid).collection(tipo).orderBy("timestamp", "desc").get();
+
+  if (snapshot.empty) {
+    alert("No hay datos para exportar.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const datos = [];
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    datos.push([d.fecha, d.hora, d.ml + " ml"]);
+  });
+
+  doc.text(`Historial de ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`, 14, 16);
+  doc.autoTable({
+    head: [["Fecha", "Hora", "Cantidad"]],
+    body: datos,
+    startY: 20
+  });
+
+  doc.save(`hidratify_${tipo}_historial.pdf`);
+}
