@@ -3,6 +3,56 @@ auth.onAuthStateChanged(user => {
   cargarDatos();
 });
 
+const METAS_KEY = "hidratify_metas";
+const RADIO = 60;
+const CIRCUNFERENCIA = 2 * Math.PI * RADIO;
+
+function getMetas() {
+  try {
+    const raw = localStorage.getItem(METAS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return { agua: 2000, orina: 1500 };
+}
+function setMeta(tipo, valor) {
+  const metas = getMetas();
+  metas[tipo] = valor;
+  localStorage.setItem(METAS_KEY, JSON.stringify(metas));
+}
+const COLAPSO_KEY = "hidratify_colapso";
+
+function getColapsos() {
+  try {
+    const raw = localStorage.getItem(COLAPSO_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return { agua: false, orina: false };
+}
+
+function aplicarColapso(tipo) {
+  const colapsado = getColapsos()[tipo];
+  const body = document.getElementById(tipo === 'agua' ? 'bodyAgua' : 'bodyOrina');
+  const chevron = document.getElementById(tipo === 'agua' ? 'chevronAgua' : 'chevronOrina');
+  body.style.display = colapsado ? 'none' : 'flex';
+  chevron.style.transform = colapsado ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+function toggleSeccion(tipo) {
+  const colapsos = getColapsos();
+  colapsos[tipo] = !colapsos[tipo];
+  localStorage.setItem(COLAPSO_KEY, JSON.stringify(colapsos));
+  aplicarColapso(tipo);
+}
+
+function editarMeta(tipo) {
+  const metas = getMetas();
+  const nuevo = prompt("Meta diaria (ml):", metas[tipo]);
+  const val = parseInt(nuevo);
+  if (isNaN(val) || val <= 0) return;
+  setMeta(tipo, val);
+  cargarDatos();
+}
+
 function formatearFecha(fecha) {
   const f = new Date(fecha);
   return f.toLocaleDateString("es-AR");
@@ -11,8 +61,15 @@ function formatearHora(fecha) {
   const f = new Date(fecha);
   return f.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit', hour12: true });
 }
-function guardarRegistro(tipo) {
-  const cantidad = parseInt(document.getElementById("mlInput").value);
+
+function guardarRegistroInput(tipo) {
+  const input = document.getElementById(tipo === 'agua' ? 'mlInputAgua' : 'mlInputOrina');
+  const cantidad = parseInt(input.value);
+  if (isNaN(cantidad) || cantidad <= 0) return;
+  guardarRegistro(tipo, cantidad, () => { input.value = ""; });
+}
+
+function guardarRegistro(tipo, cantidad, onDone) {
   if (isNaN(cantidad) || cantidad <= 0) return;
 
   const ahora = new Date();
@@ -25,41 +82,33 @@ function guardarRegistro(tipo) {
 
   const user = auth.currentUser;
   db.collection("users").doc(user.uid).collection(tipo).add(data).then(() => {
-    document.getElementById("mlInput").value = "";
+    if (onDone) onDone();
     cargarDatos();
   });
 }
 
 function cargarDatos() {
   const user = auth.currentUser;
-  cargarTabla(user, "agua", "tablaAgua", "totalAgua");
-  cargarTabla(user, "orina", "tablaOrina", "totalOrina");
+  cargarLista(user, "agua", "listaAgua", "totalAgua", "ringAgua", "metaAguaLabel");
+  cargarLista(user, "orina", "listaOrina", "totalOrina", "ringOrina", "metaOrinaLabel");
+  aplicarColapso("agua");
+  aplicarColapso("orina");
 }
-function cargarTabla(user, tipo, tablaId, totalId) {
-  const tabla = document.getElementById(tablaId);
+
+function cargarLista(user, tipo, listaId, totalId, ringId, metaLabelId) {
+  const lista = document.getElementById(listaId);
   const total = document.getElementById(totalId);
+  const ring = document.getElementById(ringId);
+  const metaLabel = document.getElementById(metaLabelId);
+  const meta = getMetas()[tipo];
 
-  // Skeleton loader
-  tabla.innerHTML = '';
-  for (let i = 0; i < 3; i++) {
-    tabla.innerHTML += `
-      <tr>
-        <td><div class="h-4 bg-gray-300 animate-pulse rounded w-20"></div></td>
-        <td><div class="h-4 bg-gray-300 animate-pulse rounded w-16"></div></td>
-        <td><div class="h-4 bg-gray-300 animate-pulse rounded w-10"></div></td>
-        <td><div class="h-4 bg-gray-300 animate-pulse rounded w-12"></div></td>
-      </tr>
-    `;
-  }
-  total.innerText = "Cargando...";
+  lista.innerHTML = `<div class="empty-state">Cargando...</div>`;
 
-  // Obtener fecha de hoy en formato local
   const hoy = new Date().toLocaleDateString("es-AR");
 
-  // Traer datos desde Firebase
   db.collection("users").doc(user.uid).collection(tipo).orderBy("timestamp", "desc").get()
     .then(snapshot => {
-      tabla.innerHTML = "";
+      lista.innerHTML = "";
       let suma = 0;
       let hayDatos = false;
 
@@ -69,31 +118,38 @@ function cargarTabla(user, tipo, tablaId, totalId) {
           hayDatos = true;
           suma += d.ml;
 
-          tabla.innerHTML += `
-            <tr>
-              <td>${d.fecha}</td>
-              <td>${d.hora}</td>
-              <td>${d.ml}</td>
-              <td>
-                <button onclick="editar('${tipo}', '${doc.id}', ${d.ml})" class="pr-2 pl-2"><i class="fa-solid fa-pencil"></i></button>
-                <button onclick="eliminar('${tipo}', '${doc.id}')" class="pr-2 pl-2"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
+          const row = document.createElement("div");
+          row.className = "entry-row";
+          row.innerHTML = `
+            <div class="entry-info">
+              <div class="entry-ml">${d.ml} ml</div>
+              <div class="entry-time">${d.hora}</div>
+            </div>
+            <button class="btn-edit" onclick="editar('${tipo}', '${doc.id}', ${d.ml})"><i class="fa-solid fa-pencil"></i></button>
+            <button class="btn-delete" onclick="eliminar('${tipo}', '${doc.id}')"><i class="fa-solid fa-trash"></i></button>
           `;
+          lista.appendChild(row);
         }
       });
 
       if (!hayDatos) {
-        tabla.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500">Sin registros hoy</td></tr>`;
+        lista.innerHTML = `<div class="empty-state">Sin registros hoy</div>`;
       }
 
-      total.innerText = suma + " ml";
+      total.innerText = suma;
+      metaLabel.innerText = `de ${meta} ml`;
+
+      const pct = Math.min(1, meta > 0 ? suma / meta : 0);
+      ring.setAttribute("stroke-dasharray", `${CIRCUNFERENCIA} ${CIRCUNFERENCIA}`);
+      ring.setAttribute("stroke-dashoffset", CIRCUNFERENCIA * (1 - pct));
     });
 }
+
 function eliminar(tipo, id) {
   const user = auth.currentUser;
   db.collection("users").doc(user.uid).collection(tipo).doc(id).delete().then(() => cargarDatos());
 }
+
 function editar(tipo, id, actual) {
   const nuevo = prompt("Editar valor (ml):", actual);
   const nuevoInt = parseInt(nuevo);
@@ -104,15 +160,13 @@ function editar(tipo, id, actual) {
     ml: nuevoInt
   }).then(() => cargarDatos());
 }
+
 document.getElementById('btnLogout').addEventListener('click', () => {
   firebase.auth().signOut()
-    .then(() => {
-      window.location.href = 'index.html';
-    })
-    .catch((error) => {
-      console.error('Error al cerrar sesión:', error);
-    });
+    .then(() => { window.location.href = 'index.html'; })
+    .catch((error) => { console.error('Error al cerrar sesión:', error); });
 });
+
 async function exportarPDF(tipo) {
   const user = auth.currentUser;
   const snapshot = await db.collection("users").doc(user.uid).collection(tipo).orderBy("timestamp", "desc").get();
