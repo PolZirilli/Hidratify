@@ -11,45 +11,127 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
-
 </head>
-<body class="bg-blue-100 min-h-screen p-4">
-  <div class="max-w-2xl mx-auto bg-white p-6 rounded-3xl shadow-md">
-    <div class="flex justify-end mb-2">
-        <button id="btnLogout" class="text-black py-1 px-3"><i class="fa-solid fa-key"></i></button>
-    </div>
-    <h2 class="text-2xl font-bold text-center mb-2"> <i class="fa-solid fa-water"></i> Hidratify</h2>
-    <input id="mlInput" type="number" placeholder="Cantidad (ml)" class="w-full p-2 border rounded-lg mb-3" />
-    <div class="flex justify-around mb-6">
-      <button onclick="guardarRegistro('agua')" class="bg-blue-400 text-white px-16 py-3 rounded-lg"><i class="fa-solid fa-glass-water"></i></button>
-      <button onclick="guardarRegistro('orina')" class="bg-yellow-300 text-white px-16 py-3 rounded-lg"><i class="fa-solid fa-toilet"></i></button>
-    </div>
-    <!-- Tabla de datos -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <h3 class="font-bold mb-2"><i class="fa-solid fa-toilet"></i> Historial Orina</h3>
-        <table class="w-full text-sm">
-          <thead><tr><th>Fecha</th><th>Hora</th><th>ml</th><th>Acciones</th></tr></thead>
-          <tbody id="tablaOrina"></tbody>
-          <tfoot><tr><td colspan="3" class="text-right font-bold">Total:</td><td id="totalOrina" class="text-right"></td></tr></tfoot>
-        </table>
-        <div class="flex justify-center mt-1 gap-4">
-          <button onclick="exportarPDF('orina')" class="bg-blue-100 text-black px-4 py-2 rounded">Exportar historial de orina <i class="fa-solid fa-file-pdf"></i></button>
+<body class="bg-[oklch(96.5%_0.008_240)] min-h-screen p-4 pb-10">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-5 px-1">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-[oklch(94%_0.03_220)] flex items-center justify-center">
+          <i class="fa-solid fa-droplet text-[oklch(45%_0.12_220)] text-sm"></i>
         </div>
+        <h1 class="font-bold text-lg text-[oklch(20%_0.02_240)]">Hidratify</h1>
       </div>
-      <div>
-        <h3 class="font-bold mb-2"><i class="fa-solid fa-glass-water"></i> Historial Agua</h3>
-        <table class="w-full text-sm">
-          <thead><tr><th>Fecha</th><th>Hora</th><th>ml</th><th>Acciones</th></tr></thead>
-          <tbody id="tablaAgua"></tbody>
-          <tfoot><tr><td colspan="3" class="text-right font-bold">Total:</td><td id="totalAgua" class="text-right"></td></tr></tfoot>
-        </table>
-        <div class="flex justify-center mt-1 gap-4">
-          <button onclick="exportarPDF('agua')" class="bg-blue-100 text-black px-4 py-2 rounded">Exportar historial de agua <i class="fa-solid fa-file-pdf"></i></button>
-        </div>
+      <button id="btnLogout" class="w-9 h-9 rounded-xl bg-white border border-[oklch(90%_0.01_240)] flex items-center justify-center text-[oklch(35%_0.02_240)]">
+        <i class="fa-solid fa-right-from-bracket text-sm"></i>
+      </button>
     </div>
-    <!-- / Tabla de datos -->
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <!-- AGUA -->
+      <section class="bg-white rounded-3xl shadow-[0_4px_20px_oklch(0%_0_0/0.05)] p-5 flex flex-col gap-4" data-screen-label="Agua">
+        <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleSeccion('agua')">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-glass-water text-[oklch(45%_0.12_220)]"></i>
+            <span class="font-bold text-[oklch(20%_0.02_240)]">Agua</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="event.stopPropagation(); editarMeta('agua')" class="text-xs font-semibold text-[oklch(45%_0.12_220)]">Editar meta</button>
+            <i id="chevronAgua" class="fa-solid fa-chevron-up text-xs text-[oklch(55%_0.02_240)] transition-transform"></i>
+          </div>
+        </div>
+
+        <div id="bodyAgua" class="flex flex-col gap-4">
+        <div class="flex flex-col items-center py-2">
+          <div class="relative w-36 h-36">
+            <svg width="144" height="144" viewBox="0 0 144 144" class="absolute inset-0 -rotate-90">
+              <circle cx="72" cy="72" r="60" fill="none" stroke="oklch(92% 0.01 240)" stroke-width="10"></circle>
+              <circle id="ringAgua" cx="72" cy="72" r="60" fill="none" stroke="oklch(45% 0.12 220)" stroke-width="10" stroke-linecap="round" style="transition: stroke-dashoffset .5s ease;"></circle>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <div id="totalAgua" class="brand-num text-2xl font-bold text-[oklch(20%_0.02_240)]">0</div>
+              <div id="metaAguaLabel" class="text-[11px] font-semibold text-[oklch(55%_0.02_240)]">de 2000 ml</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2">
+          <button onclick="guardarRegistro('agua', 100)" class="quick-chip">100</button>
+          <button onclick="guardarRegistro('agua', 200)" class="quick-chip">200</button>
+          <button onclick="guardarRegistro('agua', 300)" class="quick-chip">300</button>
+          <button onclick="guardarRegistro('agua', 500)" class="quick-chip">500</button>
+        </div>
+
+        <div class="flex gap-2">
+          <input id="mlInputAgua" type="number" inputmode="numeric" placeholder="ml personalizado" class="flex-1 min-w-0 p-3 border border-[oklch(90%_0.01_240)] rounded-xl text-sm outline-none focus:border-[oklch(45%_0.12_220)]" />
+          <button onclick="guardarRegistroInput('agua')" class="px-4 rounded-xl bg-[oklch(45%_0.12_220)] text-white font-bold text-sm">+</button>
+        </div>
+
+        <div>
+          <div class="text-xs font-bold text-[oklch(40%_0.02_240)] mb-2">Registros de hoy</div>
+          <div id="listaAgua" class="flex flex-col gap-2"></div>
+        </div>
+
+        <button onclick="exportarPDF('agua')" class="mt-1 w-full border border-[oklch(88%_0.01_240)] rounded-xl py-3 text-sm font-bold text-[oklch(28%_0.02_240)] flex items-center justify-center gap-2">
+          <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+        </button>
+        </div>
+      </section>
+
+      <!-- ORINA -->
+      <section class="bg-white rounded-3xl shadow-[0_4px_20px_oklch(0%_0_0/0.05)] p-5 flex flex-col gap-4" data-screen-label="Orina">
+        <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleSeccion('orina')">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-toilet text-[oklch(55%_0.14_75)]"></i>
+            <span class="font-bold text-[oklch(20%_0.02_240)]">Orina</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="event.stopPropagation(); editarMeta('orina')" class="text-xs font-semibold text-[oklch(55%_0.14_75)]">Editar meta</button>
+            <i id="chevronOrina" class="fa-solid fa-chevron-up text-xs text-[oklch(55%_0.02_240)] transition-transform"></i>
+          </div>
+        </div>
+
+        <div id="bodyOrina" class="flex flex-col gap-4">
+        <div class="flex flex-col items-center py-2">
+          <div class="relative w-36 h-36">
+            <svg width="144" height="144" viewBox="0 0 144 144" class="absolute inset-0 -rotate-90">
+              <circle cx="72" cy="72" r="60" fill="none" stroke="oklch(92% 0.01 240)" stroke-width="10"></circle>
+              <circle id="ringOrina" cx="72" cy="72" r="60" fill="none" stroke="oklch(55% 0.14 75)" stroke-width="10" stroke-linecap="round" style="transition: stroke-dashoffset .5s ease;"></circle>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <div id="totalOrina" class="brand-num text-2xl font-bold text-[oklch(20%_0.02_240)]">0</div>
+              <div id="metaOrinaLabel" class="text-[11px] font-semibold text-[oklch(55%_0.02_240)]">de 1500 ml</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2">
+          <button onclick="guardarRegistro('orina', 100)" class="quick-chip">100</button>
+          <button onclick="guardarRegistro('orina', 150)" class="quick-chip">150</button>
+          <button onclick="guardarRegistro('orina', 200)" class="quick-chip">200</button>
+          <button onclick="guardarRegistro('orina', 300)" class="quick-chip">300</button>
+        </div>
+
+        <div class="flex gap-2">
+          <input id="mlInputOrina" type="number" inputmode="numeric" placeholder="ml personalizado" class="flex-1 min-w-0 p-3 border border-[oklch(90%_0.01_240)] rounded-xl text-sm outline-none focus:border-[oklch(55%_0.14_75)]" />
+          <button onclick="guardarRegistroInput('orina')" class="px-4 rounded-xl bg-[oklch(55%_0.14_75)] text-white font-bold text-sm">+</button>
+        </div>
+
+        <div>
+          <div class="text-xs font-bold text-[oklch(40%_0.02_240)] mb-2">Registros de hoy</div>
+          <div id="listaOrina" class="flex flex-col gap-2"></div>
+        </div>
+
+        <button onclick="exportarPDF('orina')" class="mt-1 w-full border border-[oklch(88%_0.01_240)] rounded-xl py-3 text-sm font-bold text-[oklch(28%_0.02_240)] flex items-center justify-center gap-2">
+          <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+        </button>
+        </div>
+      </section>
 
     </div>
   </div>
@@ -58,8 +140,3 @@
   <script src="app/dashboard.js"></script>
 </body>
 </html>
-
-
-
-
-
