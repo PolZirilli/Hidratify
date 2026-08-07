@@ -31,10 +31,20 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="max-w-md mx-auto w-full">
+
+      <!-- TAB BAR -->
+      <div class="flex gap-2 mb-4 bg-white p-1.5 rounded-2xl shadow-[0_4px_20px_oklch(0%_0_0/0.05)]">
+        <button id="tabBtnAgua" onclick="switchTab('agua')" class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-colors">
+          <i class="fa-solid fa-glass-water"></i> Agua
+        </button>
+        <button id="tabBtnOrina" onclick="switchTab('orina')" class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-colors">
+          <i class="fa-solid fa-toilet"></i> Orina
+        </button>
+      </div>
 
       <!-- AGUA -->
-      <section class="bg-white rounded-3xl shadow-[0_4px_20px_oklch(0%_0_0/0.05)] p-5 flex flex-col gap-4" data-screen-label="Agua">
+      <section id="panelAgua" class="bg-white rounded-3xl shadow-[0_4px_20px_oklch(0%_0_0/0.05)] p-5 flex flex-col gap-4" data-screen-label="Agua">
         <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleSeccion('agua')">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-glass-water text-[oklch(45%_0.12_220)]"></i>
@@ -84,7 +94,7 @@
       </section>
 
       <!-- ORINA -->
-      <section class="bg-white rounded-3xl shadow-[0_4px_20px_oklch(0%_0_0/0.05)] p-5 flex flex-col gap-4" data-screen-label="Orina">
+      <section id="panelOrina" class="bg-white rounded-3xl shadow-[0_4px_20px_oklch(0%_0_0/0.05)] p-5 flex flex-col gap-4" data-screen-label="Orina">
         <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleSeccion('orina')">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-toilet text-[oklch(55%_0.14_75)]"></i>
