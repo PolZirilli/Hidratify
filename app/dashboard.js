@@ -28,6 +28,7 @@ function getTabActiva() {
 function switchTab(tipo) {
   localStorage.setItem(TAB_KEY, tipo);
   aplicarTab(tipo);
+  if (auth.currentUser) cargarListaTipo(auth.currentUser, tipo);
 }
 
 function aplicarTab(tipo) {
@@ -120,11 +121,19 @@ function guardarRegistro(tipo, cantidad, onDone) {
 
 function cargarDatos() {
   const user = auth.currentUser;
-  cargarLista(user, "agua", "listaAgua", "totalAgua", "ringAgua", "metaAguaLabel");
-  cargarLista(user, "orina", "listaOrina", "totalOrina", "ringOrina", "metaOrinaLabel");
   aplicarColapso("agua");
   aplicarColapso("orina");
-  aplicarTab(getTabActiva());
+  const tab = getTabActiva();
+  aplicarTab(tab);
+  cargarListaTipo(user, tab);
+}
+
+function cargarListaTipo(user, tipo) {
+  if (tipo === "agua") {
+    cargarLista(user, "agua", "listaAgua", "totalAgua", "ringAgua", "metaAguaLabel");
+  } else {
+    cargarLista(user, "orina", "listaOrina", "totalOrina", "ringOrina", "metaOrinaLabel");
+  }
 }
 
 function cargarLista(user, tipo, listaId, totalId, ringId, metaLabelId) {
@@ -136,35 +145,38 @@ function cargarLista(user, tipo, listaId, totalId, ringId, metaLabelId) {
 
   lista.innerHTML = `<div class="empty-state">Cargando...</div>`;
 
-  const hoy = new Date().toLocaleDateString("es-AR");
+  const inicioHoy = new Date();
+  inicioHoy.setHours(0, 0, 0, 0);
+  const finHoy = new Date();
+  finHoy.setHours(23, 59, 59, 999);
 
-  db.collection("users").doc(user.uid).collection(tipo).orderBy("timestamp", "desc").get()
+  db.collection("users").doc(user.uid).collection(tipo)
+    .where("timestamp", ">=", inicioHoy)
+    .where("timestamp", "<=", finHoy)
+    .orderBy("timestamp", "desc")
+    .get()
     .then(snapshot => {
       lista.innerHTML = "";
       let suma = 0;
-      let hayDatos = false;
 
       snapshot.forEach(doc => {
         const d = doc.data();
-        if (d.fecha === hoy) {
-          hayDatos = true;
-          suma += d.ml;
+        suma += d.ml;
 
-          const row = document.createElement("div");
-          row.className = "entry-row";
-          row.innerHTML = `
-            <div class="entry-info">
-              <div class="entry-ml">${d.ml} ml</div>
-              <div class="entry-time">${d.hora}</div>
-            </div>
-            <button class="btn-edit" onclick="editar('${tipo}', '${doc.id}', ${d.ml})"><i class="fa-solid fa-pencil"></i></button>
-            <button class="btn-delete" onclick="eliminar('${tipo}', '${doc.id}')"><i class="fa-solid fa-trash"></i></button>
-          `;
-          lista.appendChild(row);
-        }
+        const row = document.createElement("div");
+        row.className = "entry-row";
+        row.innerHTML = `
+          <div class="entry-info">
+            <div class="entry-ml">${d.ml} ml</div>
+            <div class="entry-time">${d.hora}</div>
+          </div>
+          <button class="btn-edit" onclick="editar('${tipo}', '${doc.id}', ${d.ml})"><i class="fa-solid fa-pencil"></i></button>
+          <button class="btn-delete" onclick="eliminar('${tipo}', '${doc.id}')"><i class="fa-solid fa-trash"></i></button>
+        `;
+        lista.appendChild(row);
       });
 
-      if (!hayDatos) {
+      if (snapshot.empty) {
         lista.innerHTML = `<div class="empty-state">Sin registros hoy</div>`;
       }
 
