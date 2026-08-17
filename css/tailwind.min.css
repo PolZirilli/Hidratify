@@ -492,6 +492,10 @@ video {
     justify-content: space-between
 }
 
+.gap-1 {
+    gap: .25rem
+}
+
 .gap-2 {
     gap: .5rem
 }
@@ -520,6 +524,14 @@ video {
     border-width: 1px
 }
 
+.border-b {
+    border-bottom-width: 1px
+}
+
+.border-\[oklch\(55\%_0\.14_75\)\] {
+    border-color: oklch(55% .14 75)
+}
+
 .border-\[oklch\(88\%_0\.01_240\)\] {
     border-color: oklch(88% .01 240)
 }
@@ -546,6 +558,10 @@ video {
 
 .bg-\[oklch\(96\.5\%_0\.008_240\)\] {
     background-color: oklch(96.5% .008 240)
+}
+
+.bg-transparent {
+    background-color: transparent
 }
 
 .bg-white {
@@ -604,6 +620,10 @@ video {
 
 .text-\[11px\] {
     font-size: 11px
+}
+
+.text-\[8px\] {
+    font-size: 8px
 }
 
 .text-lg {
@@ -671,6 +691,10 @@ video {
     color: rgb(255 255 255/var(--tw-text-opacity, 1))
 }
 
+.opacity-60 {
+    opacity: .6
+}
+
 .shadow-\[0_4px_20px_oklch\(0\%_0_0\/0\.05\)\] {
     --tw-shadow: 0 4px 20px oklch(0% 0 0/0.05);
     --tw-shadow-colored: 0 4px 20px var(--tw-shadow-color);
@@ -686,6 +710,11 @@ video {
 .outline-none {
     outline: 2px solid transparent;
     outline-offset: 2px
+}
+
+.blur {
+    --tw-blur: blur(8px);
+    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
 }
 
 .transition {
