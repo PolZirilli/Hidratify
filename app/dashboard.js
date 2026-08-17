@@ -45,12 +45,31 @@ function toggleSeccion(tipo) {
   aplicarColapso(tipo);
 }
 
-function editarMeta(tipo) {
+function iniciarEdicionMeta() {
   const metas = getMetas();
-  const nuevo = prompt("Meta diaria (ml):", metas[tipo]);
-  const val = parseInt(nuevo);
+  document.getElementById('metaOrinaDisplay').classList.add('hidden');
+  document.getElementById('metaOrinaDisplay').classList.remove('flex');
+  document.getElementById('metaOrinaEdit').classList.remove('hidden');
+  document.getElementById('metaOrinaEdit').classList.add('flex');
+  const input = document.getElementById('metaOrinaInput');
+  input.value = metas.orina;
+  input.focus();
+  input.select();
+}
+
+function cerrarEdicionMeta() {
+  document.getElementById('metaOrinaEdit').classList.add('hidden');
+  document.getElementById('metaOrinaEdit').classList.remove('flex');
+  document.getElementById('metaOrinaDisplay').classList.remove('hidden');
+  document.getElementById('metaOrinaDisplay').classList.add('flex');
+}
+
+function guardarMetaInline() {
+  const input = document.getElementById('metaOrinaInput');
+  const val = parseInt(input.value);
+  cerrarEdicionMeta();
   if (isNaN(val) || val <= 0) return;
-  setMeta(tipo, val);
+  setMeta('orina', val);
   cargarDatos();
 }
 
@@ -91,14 +110,14 @@ function guardarRegistro(tipo, cantidad, onDone) {
 function cargarDatos() {
   const user = auth.currentUser;
   aplicarColapso("orina");
-  cargarLista(user, "orina", "listaOrina", "totalOrina", "ringOrina", "metaOrinaLabel");
+  cargarLista(user, "orina", "listaOrina", "totalOrina", "ringOrina", "metaOrinaValor");
 }
 
-function cargarLista(user, tipo, listaId, totalId, ringId, metaLabelId) {
+function cargarLista(user, tipo, listaId, totalId, ringId, metaValorId) {
   const lista = document.getElementById(listaId);
   const total = document.getElementById(totalId);
   const ring = document.getElementById(ringId);
-  const metaLabel = document.getElementById(metaLabelId);
+  const metaValor = document.getElementById(metaValorId);
   const meta = getMetas()[tipo];
 
   lista.innerHTML = `<div class="empty-state">Cargando...</div>`;
@@ -139,7 +158,7 @@ function cargarLista(user, tipo, listaId, totalId, ringId, metaLabelId) {
       }
 
       total.innerText = suma;
-      metaLabel.innerText = `de ${meta} ml`;
+      metaValor.innerText = meta;
 
       const pct = Math.min(1, meta > 0 ? suma / meta : 0);
       ring.setAttribute("stroke-dasharray", `${CIRCUNFERENCIA} ${CIRCUNFERENCIA}`);
