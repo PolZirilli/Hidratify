@@ -11,44 +11,13 @@ function getMetas() {
   try {
     const raw = localStorage.getItem(METAS_KEY);
     if (raw) return JSON.parse(raw);
-  } catch (e) {}
-  return { agua: 2000, orina: 1500 };
+  } catch (e) { }
+  return { orina: 1500 };
 }
 function setMeta(tipo, valor) {
   const metas = getMetas();
   metas[tipo] = valor;
   localStorage.setItem(METAS_KEY, JSON.stringify(metas));
-}
-const TAB_KEY = "hidratify_tab";
-
-function getTabActiva() {
-  return localStorage.getItem(TAB_KEY) || "agua";
-}
-
-function switchTab(tipo) {
-  localStorage.setItem(TAB_KEY, tipo);
-  aplicarTab(tipo);
-  if (auth.currentUser) cargarListaTipo(auth.currentUser, tipo);
-}
-
-function aplicarTab(tipo) {
-  document.getElementById('panelAgua').style.display = tipo === 'agua' ? 'flex' : 'none';
-  document.getElementById('panelOrina').style.display = tipo === 'orina' ? 'flex' : 'none';
-
-  const btnAgua = document.getElementById('tabBtnAgua');
-  const btnOrina = document.getElementById('tabBtnOrina');
-
-  if (tipo === 'agua') {
-    btnAgua.style.background = 'oklch(45% 0.12 220)';
-    btnAgua.style.color = '#fff';
-    btnOrina.style.background = 'transparent';
-    btnOrina.style.color = 'oklch(55% 0.02 240)';
-  } else {
-    btnOrina.style.background = 'oklch(55% 0.14 75)';
-    btnOrina.style.color = '#fff';
-    btnAgua.style.background = 'transparent';
-    btnAgua.style.color = 'oklch(55% 0.02 240)';
-  }
 }
 
 const COLAPSO_KEY = "hidratify_colapso";
@@ -57,14 +26,14 @@ function getColapsos() {
   try {
     const raw = localStorage.getItem(COLAPSO_KEY);
     if (raw) return JSON.parse(raw);
-  } catch (e) {}
-  return { agua: false, orina: false };
+  } catch (e) { }
+  return { orina: false };
 }
 
 function aplicarColapso(tipo) {
   const colapsado = getColapsos()[tipo];
-  const body = document.getElementById(tipo === 'agua' ? 'bodyAgua' : 'bodyOrina');
-  const chevron = document.getElementById(tipo === 'agua' ? 'chevronAgua' : 'chevronOrina');
+  const body = document.getElementById('bodyOrina');
+  const chevron = document.getElementById('chevronOrina');
   body.style.display = colapsado ? 'none' : 'flex';
   chevron.style.transform = colapsado ? 'rotate(180deg)' : 'rotate(0deg)';
 }
@@ -95,7 +64,7 @@ function formatearHora(fecha) {
 }
 
 function guardarRegistroInput(tipo) {
-  const input = document.getElementById(tipo === 'agua' ? 'mlInputAgua' : 'mlInputOrina');
+  const input = document.getElementById('mlInputOrina');
   const cantidad = parseInt(input.value);
   if (isNaN(cantidad) || cantidad <= 0) return;
   guardarRegistro(tipo, cantidad, () => { input.value = ""; });
@@ -121,19 +90,8 @@ function guardarRegistro(tipo, cantidad, onDone) {
 
 function cargarDatos() {
   const user = auth.currentUser;
-  aplicarColapso("agua");
   aplicarColapso("orina");
-  const tab = getTabActiva();
-  aplicarTab(tab);
-  cargarListaTipo(user, tab);
-}
-
-function cargarListaTipo(user, tipo) {
-  if (tipo === "agua") {
-    cargarLista(user, "agua", "listaAgua", "totalAgua", "ringAgua", "metaAguaLabel");
-  } else {
-    cargarLista(user, "orina", "listaOrina", "totalOrina", "ringOrina", "metaOrinaLabel");
-  }
+  cargarLista(user, "orina", "listaOrina", "totalOrina", "ringOrina", "metaOrinaLabel");
 }
 
 function cargarLista(user, tipo, listaId, totalId, ringId, metaLabelId) {
